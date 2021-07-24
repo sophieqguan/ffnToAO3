@@ -75,7 +75,13 @@ While uploading, it will also download a copy of your story to your local drive.
 
 This is a console-based program, which means there's no display and all input/logging will occur in console.
 
-If error occurs (e.g. did not locate all chapters), please rerun the program. 
+
+# Troubleshooting
+
+- "select work from 1 to 0": please restart to app
+
+- "cannot find relative path": this may happen if you're running the code yourself. If this occurs, go into uploadAO3.py and remove 'from .' from the import statement 'from . import get_ffn'
+
 
 # Credits
 
