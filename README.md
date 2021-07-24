@@ -21,9 +21,9 @@ This programs transfers any story from Fanfiction.net to AO3. Please use this on
 ### Example
 
 ```
-from ffnToAO3.ffnToAO3 import uploadAO3
-
-uploadAO3.upload()
+python
+>>> from ffnToAO3.ffnToAO3 import uploadAO3
+>>> uploadAO3.upload()
 ```
 
 ### Example Program Display
