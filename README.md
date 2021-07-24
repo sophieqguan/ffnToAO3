@@ -77,4 +77,4 @@ If error occurs (e.g. did not locate all chapters), please rerun the program.
 
 # Credits
 
-metadata scraping for ffn is based on https://github.com/smilli/fanfiction's scraping method.
+metadata scraping for ffn is based on https://github.com/smilli/fanfiction scraping method.
