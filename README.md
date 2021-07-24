@@ -5,27 +5,27 @@ This programs transfers any story from Fanfiction.net to AO3. Please use this on
 
 # Usage
 
-### Install (run in command line):
-`pip install ffnToAO3` (to use as library)
-*make sure you have python installed. If not, head over to [python installation](https://www.python.org/downloads/)
-
+### Install:
+  `pip install ffnToAO3`
+  
 ### Dependencies:
   `pip install MechanicalSoup` 
-  [(mechanical soup)](https://github.com/MechanicalSoup/MechanicalSoup)
+  (https://github.com/MechanicalSoup/MechanicalSoup)
   
   `pip install cloudscraper`
-  [(cloudscraper)](https://github.com/VeNoMouS/cloudscraper)
+  (https://github.com/VeNoMouS/cloudscraper)
   
   `easy_install BeautifulSoup4` or `pip install bs4`
 
-### Example
+### Example (in command line)
 
-open any python IDE, create a new .py file:
 ```
-from ffnToAO3.ffnToAO3 import uploadAO3
-uploadAO3.upload()
+python
+
+>>> from ffnToAO3 import uploadAO3
+
+>>> uploadAO3.upload()
 ```
-and hit run.
 
 ### Example Program Display
 
@@ -67,6 +67,7 @@ Done.
 
 ```
 
+
 # Notes
 
 The program will require you to log into AO3 (but not fanfiction.net)
@@ -78,4 +79,4 @@ If error occurs (e.g. did not locate all chapters), please rerun the program.
 
 # Credits
 
-metadata scraping for ffn is based on https://github.com/smilli/fanfiction scraping method.
+metadata scraping for ffn is based on https://github.com/smilli/fanfiction's scraping method.
