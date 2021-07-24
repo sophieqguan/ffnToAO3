@@ -7,13 +7,14 @@ This programs transfers any story from Fanfiction.net to AO3. Please use this on
 
 ### Install (run in command line):
   `pip install ffnToAO3`
-  
+*make sure you have python installed. If not, head over to [python installation](https://www.python.org/downloads/)
+
 ### Dependencies:
   `pip install MechanicalSoup` 
-  (https://github.com/MechanicalSoup/MechanicalSoup)
+  [(mechanical soup)](https://github.com/MechanicalSoup/MechanicalSoup)
   
   `pip install cloudscraper`
-  (https://github.com/VeNoMouS/cloudscraper)
+  [(cloudscraper)](https://github.com/VeNoMouS/cloudscraper)
   
   `easy_install BeautifulSoup4` or `pip install bs4`
 
@@ -64,7 +65,6 @@ Chapter 4 posted.
 Done.
 
 ```
-
 
 # Notes
 
