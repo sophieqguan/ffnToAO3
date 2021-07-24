@@ -30,7 +30,7 @@ python
 ### Example Program Display
 
 ```
->>> from ffnToAO3.ffnToAO3 import uploadAO3
+>>> from ffnToAO3 import uploadAO3
 >>> uploadAO3.upload()
 Heading to AO3...
 Enter your AO3 username: Clostone
