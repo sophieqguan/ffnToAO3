@@ -25,6 +25,7 @@ open any python IDE, create a new .py file:
 from ffnToAO3.ffnToAO3 import uploadAO3
 uploadAO3.upload()
 ```
+and hit run.
 
 ### Example Program Display
 
