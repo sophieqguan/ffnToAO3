@@ -5,7 +5,7 @@ This programs transfers any story from Fanfiction.net to AO3. Please use this on
 
 # Usage
 
-### Install:
+### Install (run in command line):
   `pip install ffnToAO3`
   
 ### Dependencies:
