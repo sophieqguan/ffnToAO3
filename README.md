@@ -6,7 +6,7 @@ This programs transfers any story from Fanfiction.net to AO3. Please use this on
 # Usage
 
 ### Install (run in command line):
-  `pip install ffnToAO3`
+`pip install ffnToAO3` (to use as library)
 *make sure you have python installed. If not, head over to [python installation](https://www.python.org/downloads/)
 
 ### Dependencies:
@@ -20,6 +20,7 @@ This programs transfers any story from Fanfiction.net to AO3. Please use this on
 
 ### Example
 
+open any python IDE, create a new .py file:
 ```
 from ffnToAO3.ffnToAO3 import uploadAO3
 uploadAO3.upload()
