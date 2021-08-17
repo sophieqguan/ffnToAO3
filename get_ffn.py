@@ -6,12 +6,16 @@ import re
 from bs4 import BeautifulSoup, Tag
 import cloudscraper
 
-
-base_url = 'http://fanfiction.net'
-parser = "html.parser"
-# firefox may display error; just rerun it and it will work maybe
-# with after a few tries
-scraper = cloudscraper.create_scraper(browser="firefox")
+success = False
+while not success:
+    try:
+        base_url = 'http://fanfiction.net'
+        parser = "html.parser"
+        # firefox may display error; just rerun it and it will work maybe
+        # with after a few tries
+        scraper = cloudscraper.create_scraper(browser="firefox")
+        success = True
+    except:
 
 
 def display_works(query):
