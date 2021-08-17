@@ -1,0 +1,146 @@
+.App {
+  text-align: center;
+}
+
+.App-logo {
+  height: 40vmin;
+  pointer-events: none;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .App-logo {
+    animation: App-logo-spin infinite 20s linear;
+  }
+}
+
+.App-header {
+  background-color: #282c34;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  font-size: calc(10px + 2vmin);
+  color: white;
+}
+
+.App-link {
+  color: #61dafb;
+}
+
+@keyframes App-logo-spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+#mainDisplay {
+  border-radius:5px;
+  box-shadow: #282c34;
+  padding: 2px;
+
+}
+
+#workList{
+  margin-left:30%;
+}
+
+.workTitle {
+  color: #4665a3;
+  width: 60%;
+  border: 1px solid #dadada;
+  box-shadow: 0 2px 2px rgb(0 0 0 / 20%);
+  padding: 1%;
+  margin-bottom:2px;
+  font-size:15px;
+
+  transition: margin-left 0.5s;
+}
+
+.workTitle:hover {
+  color: #203f7c;
+  margin-left: 10%;
+  width: 60%;
+}
+
+#selectedWork {
+  text-align:center;
+
+}
+
+#workInfo {
+  width: 35%;
+  display:inline-block;
+
+  border:1px solid white;
+  border-radius:20px;
+  box-shadow:0 3px 3px rgb(0 0 0 / 20%);
+  background-color: rgb(241, 241, 241);
+  padding:10px;
+}
+
+.input {
+  background: transparent;
+  border: none;
+  border-bottom: 1px solid #000000;
+  margin-left:1px;
+  outline:none;
+}
+
+.input:focus{
+  border-bottom:2px solid rgb(189, 136, 67);
+  background-color: white;
+}
+
+.trans-btn {
+  background: transparent;
+  border: 1px solid black;
+  border-radius: 5px;
+  display:inline-block; 
+  margin-left: 5px; 
+}
+
+.trans-btn:hover {
+  background: rgb(186, 186, 186);
+  border: 1px solid rgb(97, 97, 97);
+}
+
+#ao3Form {
+  width:40%;
+  display:inline-block;  
+
+  border:1px solid white;
+  border-radius:10px;
+  box-shadow:0 3px 3px rgb(0 0 0 / 20%);
+  background-color: rgb(241, 241, 241);
+  padding:2%;
+}
+
+#reload {
+  margin:10px;
+  color:gray;
+}
+
+#intro, #timeText {
+  width:50%;
+  display: inline-block;
+  font-size: 10px;
+}
+
+.tinyText {
+  font-size: 10px;
+}
+
+#credit {
+  color: rgb(206, 206, 206);
+  font-size:10px;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .loader {
+    animation: App-logo-spin infinite 1s linear;
+  }
+}
