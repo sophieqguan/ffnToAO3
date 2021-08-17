@@ -16,6 +16,7 @@ while not success:
         scraper = cloudscraper.create_scraper(browser="firefox")
         success = True
     except:
+        continue
 
 
 def display_works(query):
