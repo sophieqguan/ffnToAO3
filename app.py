@@ -2,11 +2,11 @@ from flask import Flask, render_template, abort, jsonify, request
 from flask.helpers import send_from_directory
 from flask_cors import CORS, cross_origin
 import json
-from . import get_ffn 
-from . import uploadAO3
+import get_ffn 
+import uploadAO3
 
 
-app = Flask(__name__, static_folder='display/build', static_url_path='')
+app = Flask(__name__, static_folder='./display/build', static_url_path='')
 CORS(app)
 
 @app.route('/api/ffn/', methods=['POST'])

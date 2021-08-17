@@ -1,5 +1,5 @@
 
-from . import get_ffn, ratings
+import get_ffn, ratings
 import mechanicalsoup
 import json
 
