@@ -6,6 +6,8 @@ This programs transfers any story from Fanfiction.net to AO3. Please use this on
 
 Instead of using this as a library, you may use this directly as a web application at [ffn-to-ao3.herokuapp.com](https://ffn-to-ao3.herokuapp.com)
 
+(Currently down for maintenance)
+
 # Usage
 
 ### Install:
