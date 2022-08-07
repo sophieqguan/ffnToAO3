@@ -2,25 +2,35 @@ try:
     from urllib.parse import unquote_plus
 except ImportError:
     from urllib import unquote_plus
-import re
-from bs4 import BeautifulSoup, Tag
-import cloudscraper
+import undetected_chromedriver.v2 as uc
+from selenium.webdriver.common.by import By
+from selenium.common.exceptions import NoSuchElementException
+import TextUtils, unix
+import time
 
 base_url = 'http://fanfiction.net'
 parser = "html.parser"
 # success = False
-NOT_FOUND = "Attention Required! | Cloudflare"
 
 
 def scrape(link):
-    found = False
-    while not found:
-        scraper = cloudscraper.CloudScraper()
-        soup = BeautifulSoup(scraper.get(link).text, parser)
-        if soup is not None:
-            if "Attention Required" not in soup.find("title").text:
-                found = True
-    return soup
+    options = uc.ChromeOptions()
+    options.headless = False
+    driver = uc.Chrome(options=options, version_main=103)
+    driver.get(link)
+
+    return driver
+
+
+def scrape_headless(link):
+    options = uc.ChromeOptions()
+    options.headless = True
+    options.add_argument('--headless')
+    driver = uc.Chrome(options=options, version_main=103)
+    driver.get(link)
+
+    return driver
+
 
 def display_works(query):
     if "/" in query:
@@ -28,95 +38,68 @@ def display_works(query):
     else:
         url = "https://www.fanfiction.net/~" + query
 
-    soup = scrape(url)
-    div_tag = soup.find("div", {"id": "st_inside"})
-
-    titles = []
-    urls = []
-
-    # getting list of works
-    if div_tag is not None:
-        for tag in div_tag:
-            if isinstance(tag, Tag):
-                title = tag.find('a', {"class": "stitle"}).text
-                titles.append(title)
-                link = tag.find('a', href=True)
-                urls.append(base_url + link['href'])
-            else:
-                pass
+    try:
+        driver = scrape_headless(url)
+        elements = driver.find_elements(By.XPATH, "//div[@id='st_inside']/div[@class='z-list mystories']")
+    except NoSuchElementException:
+        driver = scrape(url)
+        time.sleep(3)
+        elements = driver.find_elements(By.XPATH, "//div[@id='st_inside']/div[@class='z-list mystories']")
 
     works = {}
-    # title: url
-    for i, title in enumerate(titles):
-        works[2 * i] = titles[i]
-        works[2 * i + 1] = urls[i]
+    for i, element in enumerate(elements):
+        works[i] = get_metadata(element)
 
     return works
 
 
-def select_work(num, title, link):
-    """
-    print("\n\nSelect work from %i to %i to move to AO3:\n" % (1, len(titles)))
-    work = int(input()) - 1
-    while work > len(titles) or work < 0:
-        print("please enter a valid entry index number.\n")
-        work = int(input())
-    
-    # transfer to work content function
-    title = titles[work]
-    link = urls[work]
-    """
+def get_metadata(element):
+    story_id = element.get_attribute('data-storyid')
+    title = TextUtils.clean(element.get_attribute('data-title').strip())
+    url = element.find_element(By.XPATH, ".//a").get_attribute('href').strip()
+    fandom = TextUtils.clean(element.get_attribute('data-category').strip())
+    chapters = element.get_attribute('data-chapters')
+    word_count = element.get_attribute('data-wordcount')
+    submit_date = unix.am(element.get_attribute('data-datesubmit').strip())
+    summary = TextUtils.clean(element.find_element(By.XPATH, "./div[@class='z-indent z-padtop']").get_attribute('innerHTML').strip().split('<div class="z-padtop2 xgray">')[0])
 
-    print("Story to be transfered -----")
-    print("story title: " + title)
-    print("story link: " + link)
-    print("----------------------------")
-    meta = scrape_story_metadata(link)
-    
-    # get_work_content(title, link, meta)
+    metadata_bar = element.find_element(By.XPATH, "./div[@class='z-indent z-padtop']/*[1]").get_attribute('innerHTML').strip().split(' - ')
+    rating = metadata_bar[1].split(": ")[1]
+    lang = metadata_bar[2]
+    genre = get_genres(metadata_bar[3])
 
-    return link
+    if metadata_bar[len(metadata_bar) - 1] == 'Complete':
+        if '</span>' in metadata_bar[len(metadata_bar) - 2]:
+            characters = []
+        else:
+            characters = metadata_bar[len(metadata_bar) - 2].split(', ')
+    elif '</span>' in metadata_bar[len(metadata_bar) - 1]:
+        characters = []
+    else:
+        characters = metadata_bar[len(metadata_bar) - 1].split(', ')
 
+    if element.get_attribute('data-statusid') == '2':
+        status = "Complete"
+    else:
+        status = "Incomplete"
 
-def get_chapter_count(link):
-    count = 1
-    soup = scrape(link)
+    metadata = {
+        "title": title,
+        "url": url,
+        "chapters": chapters,
+        "fandom": fandom,
+        "submit_date": submit_date,
+        "status": status,
+        "summary": summary,
+        "word_count": word_count,
+        "story_id": story_id,
+        "rated": rating,
+        "lang": lang,
+        "genres": genre,
+        "characters": characters,
+    }
 
-    parent = soup.find("select", {"title": "Chapter Navigation"})
-    if parent is not None:
-        children = parent.findAll("option")
-        for child in children:
-            count = child['value']
-    return int(count)
-
-
-def get_work_content(title, link):
-    baseURL = '/tmp/'
-    update_link = link.split('/')
-    ch_ct = get_chapter_count(link)
-    print("getting a total of %i chapters..." % ch_ct)
-    fullWork = {}
-    for i in range(1, ch_ct + 1):
-        print("IN")
-        chnm = str(i)
-        update_link[5] = chnm
-        new_link = '/'.join(update_link)
-
-        soup = scrape(new_link)
-        whole = soup.find("div", {"id": "storytext"})
-        all_tags = whole.findAll("p")
-
-        work = ""
-        #with open(baseURL + title + chnm + ".txt", "w", encoding='utf-8') as writer:
-        for tag in all_tags:
-            if isinstance(tag, Tag):
-                work += "\t" + str(tag) + "\n"
-                # writer.write("\t" + str(tag) + "\n")
-            else:
-                pass
-        fullWork[i] = work # CH 1 ~ n : WORKSTRING
-        # writer.close()
-    return fullWork
+    return metadata
 
 
 def get_genres(genre_text):
@@ -132,93 +115,73 @@ def get_genres(genre_text):
     return corrected_genres
 
 
-def scrape_story_metadata(url):
-    """
-    Returns a dictionary with the metadata for the story.
-    Attributes:
-        -id: the id of the story
-        -canon_type: the type of canon
-        -canon: the name of the canon
-        -author_id: the user id of the author
-        -title: the title of the story
-        -updated: the timestamp of the last time the story was updated
-        -published: the timestamp of when the story was originally published
-        -lang: the language the story is written in
-        -genres: a list of the genres that the author categorized the story as
-        -summary: summary of work by author
-        -num_reviews
-        -num_favs
-        -num_follows
-        -num_words: total number of words in all chapters of the story
-        -rated: the story's rating
-        -chapters: num of chapters
-    """
-    url_content = url.split('/')
-    story_id = url_content[4]
-    soup = scrape(url)
+def get_chapter_count(link):
+    count = 1
+    soup = scrape(link)
 
-    # find fandom
-    lc_bar = soup.find('span', {"class": "lc-left"}).find_all("a")
-    fandom = lc_bar[1].text
+    parent = soup.find("select", {"title": "Chapter Navigation"})
+    if parent is not None:
+        children = parent.findAll("option")
+        for child in children:
+            count = child['value']
+    return int(count)
 
-    psl_whole = soup.find('span', {"class": "xgray xcontrast_txt"})
-    pre_story_links = psl_whole.find_all('a')
 
-    # get author id, title, and timestamp and genre
-    author_id = int(re.search(r"var userid = (.*);", str(soup)).groups()[0])
-    title = re.search(r"var title = (.*);", str(soup)).groups()[0]
-    title = unquote_plus(title)[1:-1]
-    metadata_div = soup.find(id='profile_top')
-    times = metadata_div.find_all(attrs={'data-xutime': True})
-
-    # one chapter stories have no updated time
-    if len(times) == 1:
-        published = int(times[0]['data-xutime'])
-    else:
-        published = int(times[1]['data-xutime'])
-
-    metadata_text = metadata_div.find(class_='xgray xcontrast_txt').text
-    metadata_parts = metadata_text.split('-')
-    genres = get_genres(metadata_parts[2].strip())
-
-    # get summary
-    summary = soup.find('div', {'style':"margin-top:2px", 'class':"xcontrast_txt"}).text
-
-    # put into metadata collection
-    print("Getting metadata...")
-    metadata = {
-        'id': story_id,
-        'fandom': fandom,
-        'rated': pre_story_links[0].text,
-        'review': pre_story_links[1].text,
-        'author_id': author_id,
-        'title': title,
-        'updated': int(times[0]['data-xutime']),
-        'published': published,
-        'lang': metadata_parts[1].strip(),
-        'genres': genres,
-        'summary': summary,
-        'chapters': get_chapter_count(url)
-    }
-    for parts in metadata_parts:
-        parts = parts.strip()
-        tag_and_val = parts.split(':')
-        if len(tag_and_val) != 2:
-            continue
-        tag, val = tag_and_val
-        tag = tag.strip().lower()
-        if tag not in metadata:
-            val = val.strip()
+def get_chapter_content(link):
+    content = ""
+    try:
+        driver = scrape_headless(link)
+        content = driver.find_element(By.XPATH, "//div[@id='storytext']").get_attribute('innerHTML')
+        success = True
+    except NoSuchElementException:
+        success = False
+        while not success:
             try:
-                val = int(val.replace(',', ''))
-                metadata['num_' + tag] = val
-            except:
-                metadata[tag] = val
-    if 'status' not in metadata:
-        metadata['status'] = 'Incomplete'
+                driver = scrape(link)
+                time.sleep(5)
+                content = driver.find_element(By.XPATH, "//div[@id='storytext']").get_attribute('innerHTML')
+                success = True
+            except NoSuchElementException:
+                print("Unsuccessful. Trying again")
 
-    return metadata
+    return content
 
 
-if __name__ == "__main__":
-    print(display_works("Kadrian"))
+def get_work_content(work, link):
+    print(link)
+    update_link = link.split('/')
+    ch_ct = int(work['chapters'])
+    print("getting a total of %i chapters..." % ch_ct)
+    full_work = {}
+    for i in range(1, ch_ct + 1):
+        chnm = str(i)
+        update_link[5] = chnm
+        new_link = '/'.join(update_link)
+
+        success = False
+        try:
+            driver = scrape_headless(new_link)
+            content = driver.find_element(By.XPATH, "//div[@id='storytext']").get_attribute('innerHTML')
+            success = True
+        except NoSuchElementException:
+            while not success:
+                try:
+                    driver = scrape(new_link)
+                    time.sleep(3)
+                    content = driver.find_element(By.XPATH, "//div[@id='storytext']").get_attribute('innerHTML')
+                    success = True
+                except NoSuchElementException:
+                    time.sleep(10)  # sorry
+
+        full_work[i] = content
+
+    return full_work
+
+
+def fancy_print(works):
+    for id, work in works.items():
+        print(id, work['title'])
+        for name, value in work.items():
+            print("\t", name, ": ", value)
+
+

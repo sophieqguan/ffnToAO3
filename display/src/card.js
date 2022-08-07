@@ -5,47 +5,17 @@ import App from './App';
 function Card(work) {
     const apiURL = '/api/metadata/';
 
-    var id = work[0];
-    var title = work[1];
-    var url = work[2];
+    var title = work.title;
+    var url = work.url;
 
     const [usernameAO3, setUsernameAO3] = useState("");
     const [wordAO3, setWordAO3] = useState("");
-    const [workContent, setWorkContent] = useState([]);
-    var [metadata, setMetadata] = useState([]);
     const [newWorkURL, setNewWorkURL] = useState("");
 
-    async function getFullWork () {
-        const formData = new FormData();
-        formData.append('title', title);
-        formData.append('url', url);
-
-        let downloadContent = await fetch('/api/content/', {
-            method: 'post',
-            body: formData,
-        }).then(res => res.json())
-            .then(data => {
-            // console.log(data)
-            setWorkContent(data)      
-        });
-    }
-    
-    async function getMetaData () {
+    async function getAO3Login () {
         hideBlock('confirm');
-        
-        const formData = new FormData();
-        formData.append('url', url);
-
-        let meta = await fetch(apiURL, {
-            method: 'post',
-            body: formData,
-        }).then( (response) => response.json()).then(data => {
-          setMetadata(data);
-          getFullWork();
-          hideBlock('workInfo')
-          showBlock('ao3Log');
-        });
-
+        hideBlock('workInfo');
+        showBlock('ao3Log');
     }
 
     async function getAO3Session (e) {
@@ -56,22 +26,24 @@ function Card(work) {
         const formData = new FormData();
         formData.append('username', usernameAO3);
         formData.append('password', wordAO3);
-        formData.append('meta', JSON.stringify(metadata));
-        formData.append('content', JSON.stringify(workContent));
+        formData.append('meta', JSON.stringify(work));
         showLoading();
+
 
         await fetch ('/api/AO3Login/', {
             method: 'post',
             body: formData,
         }).then( (response) => response.text()).then(data => {
             hideLoading();
-            if (data === 'INVALID') {
-                showBlock('invalidLogin')
+            if (data === 1) {
+                console.log("Sorry, I think something went wrong lmao. Let's try again.");
+                showBlock('invalidLogin');
+                showBlock('ao3Log');
             } else {
                 setNewWorkURL(data);
                 showBlock('newURL');
 
-                updateMetaDataDisplay();                
+                updateMetaDataDisplay();
                 showBlock('ao3CardLink');
                 showBlock('workInfo');
 
@@ -88,9 +60,10 @@ function Card(work) {
     const updateMetaDataDisplay = () => {
         var displayLoc = document.getElementById('metadata');
         displayLoc.innerHTML = "";
-        newMeta(displayLoc, 'fandom', metadata['fandom']);
-        newMeta(displayLoc, 'chapters', metadata['chapters']);
-        newMeta(displayLoc, 'summary', metadata['summary']);
+        newMeta(displayLoc, 'fandom', work.fandom);
+        newMeta(displayLoc, 'chapters', work.chapters);
+        newMeta(displayLoc, 'summary', work.summary);
+        newMeta(displayLoc, 'published date', work.submit_date);
     }
     const newMeta = (loc, key, val) => {
         var newMeta = document.createElement('p');
@@ -138,10 +111,15 @@ function Card(work) {
                             <h5 class="card-title">{title}</h5>
                             <h6 class="card-subtitle mb-2 text-muted"><a href={url} class="card-link">ff.net/{title}</a></h6>
                             <h6 id='ao3CardLink' class="card-subtitle mb-2 text-muted" style={{display: 'none'}}><a href={newWorkURL} class="card-link">ao3.com/{title}</a></h6>
-                            <p id='metadata' class="card-text"></p>
+                            <div id='metadata' class="card-text">
+                                <p> <b>Fandom</b> : {work.fandom} </p>
+                                <p> <b>Chapters</b> :  {work.chapters} </p>
+                                <p> <b>Summary</b> : {work.summary} </p>
+                                <p> <b>Published Date</b> : {work.submit_date} </p>
+                            </div>
                             <div id='confirm'>
                                 <p>is this the right story?</p>
-                                <button class='trans-btn' type="submit" onClick={getMetaData}>this one alright</button>
+                                <button class='trans-btn' type="submit" onClick={getAO3Login}>this one alright</button>
                                 <button class='trans-btn' type="cancel" onClick={cancelSelect}>no go back</button>
 
                             </div>
