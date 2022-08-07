@@ -1,13 +1,14 @@
 import './App.css';
 import React, {useState} from 'react';
 import card from './card';
+import loader from './loader';
 
 function App() {
   // USERNAME (FFN)
   const [usernameFFN, setUsernameFFN] = useState("");
   // ID, TITLE, URL
   const [selectedWork, setSelectedWork] = useState([]);
-  var works = [];
+  var works = {};
 
   async function getWorks(e) {
     // console.log("[DISPLAY WORK]");
@@ -18,16 +19,36 @@ function App() {
     hideBlock('ffn-user');
     const formData = new FormData();
     formData.append('username', usernameFFN);
+    showLoading();
 
     await fetch ('/api/ffn/', {
         method: 'post',
         body: formData,
     }).then( (response) => response.json()).then(data => {
-      works = data;
-      // console.log(data);
-      displayWorks();
+        works = data;
+        displayWorks();
+        hideLoading();
     });
+
+    hideLoading();
     
+  }
+
+  let text;
+  const showLoading = () => {
+    showBlock('loading');
+    showBlock('noteStory');
+    document.getElementById("loading").classList.add("loader");
+    const loadingText = new loader(document.getElementById("loadText"));
+    loadingText.start();
+    text = setInterval(function(){document.getElementById("loadText").innerHTML = loadingText.get()},2000);
+  }
+
+  const hideLoading = () => {
+    clearInterval(text);
+    hideBlock('noteStory');
+    hideBlock('loadText');
+    hideBlock('loading');
   }
 
   const displayWorks = () => {
@@ -37,9 +58,9 @@ function App() {
     if (len == 0) list.innerHTML = "<b>Empty or Invalid user</b><br/><p class='tinyText'>unless this is what you want...? weird flex but ok</p>";
     else {
       list.innerHTML = "<b>Select a work:</b>";
-      for (let i = 0; i < len; i++) {
-        newTitle(list, i + 1, works[2 * i]);
-      }
+      Object.keys(works).map((key, i) => {
+        newTitle(list, i + 1, works[key].title);
+      });
     }
   }
   
@@ -66,7 +87,7 @@ function App() {
   }
 
   async function showInfo (id) {
-    var selected = [id, works[2 * id], works[2 * id + 1]];
+    var selected = works[id];
     setSelectedWork(selected);
     // console.log(selectedWork);
     // console.log("show info for " + id);
@@ -90,6 +111,17 @@ function App() {
 
         <button class='trans-btn' id="submitBtn" type="submit">search</button>
       </form>
+
+
+        <div id='noteStory' style={{display: 'none'}}>
+            <p id='timeText'>
+                <br/>To prevent overloading the server, each chapter takes 5 - 6 secs to be uploaded.
+                <br/>If your work is like 100 chapters, ah man....
+                <br/>But good news is that it will be done.
+                <br/><br/>
+            </p>
+        </div>
+
       <div id="mainDisplay">
         <div id="workList" style={{textAlign:"left"}}></div>
         {card(selectedWork)}
