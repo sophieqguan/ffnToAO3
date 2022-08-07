@@ -10,7 +10,6 @@ import time
 
 base_url = 'http://fanfiction.net'
 parser = "html.parser"
-# success = False
 
 
 def scrape(link):
