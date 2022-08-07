@@ -6,34 +6,35 @@ import re
 from bs4 import BeautifulSoup, Tag
 import cloudscraper
 
-success = False
-while not success:
-    try:
-        base_url = 'http://fanfiction.net'
-        parser = "html.parser"
-        # firefox may display error; just rerun it and it will work maybe
-        # with after a few tries
-        scraper = cloudscraper.create_scraper(browser="firefox")
-        success = True
-    except:
-        continue
+base_url = 'http://fanfiction.net'
+parser = "html.parser"
+# success = False
+NOT_FOUND = "Attention Required! | Cloudflare"
 
+
+def scrape(link):
+    found = False
+    while not found:
+        scraper = cloudscraper.CloudScraper()
+        soup = BeautifulSoup(scraper.get(link).text, parser)
+        if soup is not None:
+            if "Attention Required" not in soup.find("title").text:
+                found = True
+    return soup
 
 def display_works(query):
-    # print("Heading to ffnet...")
     if "/" in query:
         url = query
     else:
         url = "https://www.fanfiction.net/~" + query
 
-    soup = BeautifulSoup(scraper.get(url).text, "html.parser")
+    soup = scrape(url)
     div_tag = soup.find("div", {"id": "st_inside"})
 
     titles = []
     urls = []
 
-   # print("Getting list of works...")
-   # print("\t if chapters are not displaying, restart the app.")
+    # getting list of works
     if div_tag is not None:
         for tag in div_tag:
             if isinstance(tag, Tag):
@@ -41,14 +42,17 @@ def display_works(query):
                 titles.append(title)
                 link = tag.find('a', href=True)
                 urls.append(base_url + link['href'])
-            else:                pass
-    works = {} 
-    # 0 TITLE
-    # 1 URL
+            else:
+                pass
+
+    works = {}
+    # title: url
     for i, title in enumerate(titles):
         works[2 * i] = titles[i]
         works[2 * i + 1] = urls[i]
+
     return works
+
 
 def select_work(num, title, link):
     """
@@ -76,7 +80,7 @@ def select_work(num, title, link):
 
 def get_chapter_count(link):
     count = 1
-    soup = BeautifulSoup(scraper.get(link).text, parser)
+    soup = scrape(link)
 
     parent = soup.find("select", {"title": "Chapter Navigation"})
     if parent is not None:
@@ -98,7 +102,7 @@ def get_work_content(title, link):
         update_link[5] = chnm
         new_link = '/'.join(update_link)
 
-        soup = BeautifulSoup(scraper.get(new_link).text, parser)
+        soup = scrape(new_link)
         whole = soup.find("div", {"id": "storytext"})
         all_tags = whole.findAll("p")
 
@@ -151,7 +155,7 @@ def scrape_story_metadata(url):
     """
     url_content = url.split('/')
     story_id = url_content[4]
-    soup = BeautifulSoup(scraper.get(url).text, "html.parser")
+    soup = scrape(url)
 
     # find fandom
     lc_bar = soup.find('span', {"class": "lc-left"}).find_all("a")
@@ -216,9 +220,5 @@ def scrape_story_metadata(url):
     return metadata
 
 
-def main():
-    display_works()
-
-
 if __name__ == "__main__":
-    main()
+    print(display_works("Kadrian"))
