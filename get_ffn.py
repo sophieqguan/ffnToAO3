@@ -5,29 +5,46 @@ except ImportError:
 import undetected_chromedriver.v2 as uc
 from selenium.webdriver.common.by import By
 from selenium.common.exceptions import NoSuchElementException
+from selenium import webdriver
 import TextUtils, unix
 import time
+import os
 
 base_url = 'http://fanfiction.net'
 parser = "html.parser"
 
 
 def scrape(link):
+    options = webdriver.ChromeOptions()
+    options.add_argument("start-maximized")
+    options.add_argument('--no-sandbox')
+    options.add_argument('--disable-dev-shm-usage')
+    driver = uc.Chrome(executable_path=os.environ.get("CHROMEDRIVER_PATH"), options=options, version_main=103)
+    driver.get(link)
+    """
     options = uc.ChromeOptions()
     options.headless = False
     driver = uc.Chrome(options=options, version_main=103)
     driver.get(link)
-
+    """
     return driver
 
 
 def scrape_headless(link):
+    options = webdriver.ChromeOptions()
+    options.add_argument("start-maximized")
+    options.add_argument('--headless')
+    options.add_argument('--no-sandbox')
+    options.add_argument('--disable-dev-shm-usage')
+    driver = uc.Chrome(executable_path=os.environ.get("CHROMEDRIVER_PATH"), options=options, version_main=103)
+    driver.get(link)
+    """
     options = uc.ChromeOptions()
     options.headless = True
     options.add_argument('--headless')
     driver = uc.Chrome(options=options, version_main=103)
     driver.get(link)
-
+    """
     return driver
 
 
@@ -48,7 +65,6 @@ def display_works(query):
     works = {}
     for i, element in enumerate(elements):
         works[i] = get_metadata(element)
-
     return works
 
 
@@ -184,3 +200,5 @@ def fancy_print(works):
             print("\t", name, ": ", value)
 
 
+if __name__ == '__main__':
+    fancy_print(display_works("Kadrian"))
