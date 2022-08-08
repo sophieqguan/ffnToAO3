@@ -26,6 +26,7 @@ function App() {
         body: formData,
     }).then( (response) => response.json()).then(data => {
         works = data;
+        console.log(works)
         displayWorks();
         hideLoading();
     });
