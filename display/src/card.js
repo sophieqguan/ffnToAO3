@@ -144,7 +144,7 @@ function Card(work) {
                 <div id='loadText'></div>
                 <div id='note' style={{display: 'none'}}>
                     <p id='timeText'> 
-                        <br/>To prevent overloading the server, each chapter takes 1 to 2 secs to be uploaded.
+                        <br/>To prevent overloading the server, each chapter takes 5 to 6 secs to be uploaded.
                         <br/>If your work is like 100 chapters, ah man....
                         <br/><br/>
                     </p>

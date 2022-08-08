@@ -116,9 +116,7 @@ function App() {
 
         <div id='noteStory' style={{display: 'none'}}>
             <p id='timeText'>
-                <br/>To prevent overloading the server, each chapter takes 5 - 6 secs to be uploaded.
-                <br/>If your work is like 100 chapters, ah man....
-                <br/>But good news is that it will be done.
+                <br/>Retrieving your stories...
                 <br/><br/>
             </p>
         </div>
