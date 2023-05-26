@@ -2,6 +2,8 @@
 
 Transfers any story from Fanfiction.net to AO3. Please use this only for stories that you have claims to.
 
+** For a more recent version, please go to [ffn2ao3-cli](https://github.com/sophieqguan/ffn2ao3)**
+
 # Heroku
 
 [ffn-to-ao3.herokuapp.com](https://ffn-to-ao3.herokuapp.com)
