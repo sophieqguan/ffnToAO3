@@ -4,6 +4,6 @@ services:
     runtime: python
     buildCommand: |
       pip install -r requirements.txt
-      npm --prefix display ci
+      npm --prefix display install
       npm --prefix display run build
     startCommand: gunicorn app:app --bind 0.0.0.0:$PORT
