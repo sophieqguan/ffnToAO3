@@ -135,6 +135,11 @@
 #credit {
   color: rgb(206, 206, 206);
   font-size:10px;
+  margin-top: 24px;
+}
+
+#credit a {
+  color: rgb(206, 206, 206);
 }
 
 @media (prefers-reduced-motion: no-preference) {

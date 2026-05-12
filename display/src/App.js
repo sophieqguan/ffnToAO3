@@ -127,7 +127,13 @@ function App() {
         <div id="mainWork"></div>
       </div>
 
-      <a id="credit" href="https://github.com/clostone/ffnToAO3">@clostone</a>
+      <div id="credit">
+        <a href="https://github.com/clostone/ffnToAO3">@clostone</a>
+        {' | '}
+        <a href="https://github.com/sophieqguan/ffnToAO3/issues">Log an issue</a>
+        {' | '}
+        <a href="https://github.com/sophieqguan/ffnToAO3/pulls">Contribute</a>
+      </div>
     </div>
   );
 }
