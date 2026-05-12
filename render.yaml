@@ -7,6 +7,3 @@ services:
       npm --prefix display ci
       npm --prefix display run build
     startCommand: gunicorn app:app --bind 0.0.0.0:$PORT
-    envVars:
-      - key: PYTHON_VERSION
-        value: 3.11.0
