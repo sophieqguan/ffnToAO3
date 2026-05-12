@@ -4,7 +4,7 @@ Transfers any story from Fanfiction.net to AO3. Please use this only for stories
 
 # Web Version
 
-[[ffntoao3.onrender.com](https://ffntoao3.onrender.com)](https://ffn2ao3.onrender.com/)
+[ffn2ao3.onrender.com](https://ffn2ao3.onrender.com/)
 
 
 # Notes
