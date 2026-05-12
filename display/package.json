@@ -13,9 +13,12 @@
   },
   "scripts": {
     "start": "react-scripts start",
-    "build": "react-scripts build",
+    "build": "NODE_OPTIONS=--openssl-legacy-provider react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject"
+  },
+  "engines": {
+    "node": "18"
   },
   "eslintConfig": {
     "extends": [
@@ -35,5 +38,5 @@
       "last 1 safari version"
     ]
   },
-  "proxy": "https://ffn-to-ao3.herokuapp.com/"
+  "proxy": "http://localhost:5001"
 }
