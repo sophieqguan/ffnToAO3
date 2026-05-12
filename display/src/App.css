@@ -56,14 +56,12 @@
   padding: 1%;
   margin-bottom:2px;
   font-size:15px;
-
-  transition: margin-left 0.5s;
 }
 
 .workTitle:hover {
   color: #203f7c;
-  margin-left: 10%;
-  width: 60%;
+  background-color: #4a7fd4;
+  cursor: pointer;
 }
 
 #selectedWork {
