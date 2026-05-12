@@ -1,16 +1,15 @@
-import React, {useEffect, useState} from 'react';
+import React, {useState} from 'react';
 import loader from './loader';
-import App from './App';
 
 function Card(work) {
-    const apiURL = '/api/metadata/';
-
     var title = work.title;
     var url = work.url;
 
     const [usernameAO3, setUsernameAO3] = useState("");
     const [wordAO3, setWordAO3] = useState("");
     const [newWorkURL, setNewWorkURL] = useState("");
+    const [errorMsg, setErrorMsg] = useState("");
+    const [statusMsg, setStatusMsg] = useState("");
 
     async function getAO3Login () {
         hideBlock('confirm');
@@ -22,34 +21,64 @@ function Card(work) {
         e.preventDefault();
 
         hideBlock('ao3Log');
-        console.log('submitted!');
+        hideBlock('invalidLogin');
+        setErrorMsg("");
+        setStatusMsg("");
+
         const formData = new FormData();
         formData.append('username', usernameAO3);
         formData.append('password', wordAO3);
         formData.append('meta', JSON.stringify(work));
+
         showLoading();
 
+        try {
+            const startResp = await fetch('/api/AO3Login/', {
+                method: 'post',
+                body: formData,
+            });
+            const startData = await startResp.json();
 
-        await fetch ('/api/AO3Login/', {
-            method: 'post',
-            body: formData,
-        }).then( (response) => response.text()).then(data => {
-            hideLoading();
-            if (data === 1) {
-                console.log("Sorry, I think something went wrong lmao. Let's try again.");
+            if (startData.error) {
+                hideLoading();
+                setErrorMsg(startData.error);
                 showBlock('invalidLogin');
                 showBlock('ao3Log');
-            } else {
-                setNewWorkURL(data);
-                showBlock('newURL');
-
-                updateMetaDataDisplay();
-                showBlock('ao3CardLink');
-                showBlock('workInfo');
-
-                setWordAO3(""); // clear password
+                return;
             }
-        });
+
+            const jobId = startData.job_id;
+
+            while (true) {
+                await new Promise(r => setTimeout(r, 1000));
+                const pollResp = await fetch(`/api/status/${jobId}`);
+                const data = await pollResp.json();
+
+                if (data.status) setStatusMsg(data.status);
+
+                if (data.done) {
+                    hideLoading();
+                    if (data.error) {
+                        setErrorMsg(data.error);
+                        showBlock('invalidLogin');
+                        showBlock('ao3Log');
+                    } else {
+                        setNewWorkURL(data.url);
+                        showBlock('newURL');
+                        updateMetaDataDisplay();
+                        showBlock('ao3CardLink');
+                        showBlock('workInfo');
+                        setWordAO3("");
+                    }
+                    return;
+                }
+            }
+        } catch (err) {
+            hideLoading();
+            setErrorMsg('Network error: ' + err.message);
+            showBlock('invalidLogin');
+            showBlock('ao3Log');
+        }
     }
 
     const cancelSelect = () => {
@@ -72,21 +101,20 @@ function Card(work) {
     }
 
     const hideBlock = (id) => {
-        // console.log("hide!");
         var block = document.getElementById(id);
-        block.style.display = "none";
+        if (block) block.style.display = "none";
     }
 
     const showBlock = (id) => {
-        // console.log("show!");
         var block = document.getElementById(id);
-        block.style.display = "";
+        if (block) block.style.display = "";
     }
 
     let text;
     const showLoading = () => {
         showBlock('loading');
         showBlock('note');
+        showBlock('statusLine');
         document.getElementById("loading").classList.add("loader");
         const loadingText = new loader(document.getElementById("loadText"));
         loadingText.start();
@@ -98,14 +126,17 @@ function Card(work) {
         hideBlock('note');
         hideBlock('loadText');
         hideBlock('loading');
+        hideBlock('statusLine');
     }
-    
+
     return (
         <div class="container">
             <div class='row'>
                 <div class ='col-sm-12 col-m-12 col-12'>
                     <div id='newURL' style={{display:'none'}}>tada! <a href={newWorkURL}>{title} - {usernameAO3} - archiveofourown.com</a></div>
-                    <div id='invalidLogin' style={{display:'none'}}>Your password or username was wrong.</div>
+                    <div id='invalidLogin' style={{display:'none', color:'#c0392b', fontSize:'13px', padding:'6px 0'}}>
+                        Error: {errorMsg || 'Something went wrong. Please try again.'}
+                    </div>
                     <div id="workInfo" class="card" style={{display:'none'}}>
                         <div class="card-body">
                             <h5 class="card-title">{title}</h5>
@@ -121,7 +152,6 @@ function Card(work) {
                                 <p>is this the right story?</p>
                                 <button class='trans-btn' type="submit" onClick={getAO3Login}>this one alright</button>
                                 <button class='trans-btn' type="cancel" onClick={cancelSelect}>no go back</button>
-
                             </div>
                         </div>
                     </div>
@@ -131,25 +161,27 @@ function Card(work) {
                     <div class='login'>
                         <p>Login to AO3</p>
                         <form id='ao3Form' onSubmit={getAO3Session}>
-                            <p>AO3 Username: 
+                            <p>AO3 Username:
                             <input class='input' type='username' name='userAO3' id='userAO3' onChange={e => setUsernameAO3(e.target.value)}></input></p>
-                            <p>AO3 Password: 
+                            <p>AO3 Password:
                             <input class='input' type='password' name='passwordAO3' id='passwordAO3' onChange={e => setWordAO3(e.target.value)}></input></p>
-
                             <button class='trans-btn' type="submit">Log In</button>
                         </form>
                     </div>
                 </div>
+
                 <div id="loading" style={{color:"black", paddingBottom:"1%", fontSize: "30px", display: 'none'}}>.</div>
                 <div id='loadText'></div>
+                <div id='statusLine' style={{display:'none', fontSize:'13px', color:'#555', padding:'4px 0', fontStyle:'italic'}}>
+                    {statusMsg}
+                </div>
                 <div id='note' style={{display: 'none'}}>
-                    <p id='timeText'> 
+                    <p id='timeText'>
                         <br/>To prevent overloading the server, each chapter takes 5 to 6 secs to be uploaded.
                         <br/>If your work is like 100 chapters, ah man....
                         <br/><br/>
                     </p>
                 </div>
-
             </div>
         </div>
     );
