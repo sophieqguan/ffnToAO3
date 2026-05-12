@@ -56,10 +56,10 @@ function App() {
     hideBlock('submitBtn');
     var len = (Object.keys(works).length) / 2;
     var list = document.getElementById('workList');
-    if (len == 0) list.innerHTML = "<b>Empty or Invalid user</b><br/><p class='tinyText'>unless this is what you want...? weird flex but ok</p>";
+    if (len === 0) list.innerHTML = "<b>Empty or Invalid user</b><br/><p class='tinyText'>unless this is what you want...? weird flex but ok</p>";
     else {
       list.innerHTML = "<b>Select a work:</b>";
-      Object.keys(works).map((key, i) => {
+      Object.keys(works).forEach((key, i) => {
         newTitle(list, i + 1, works[key].title);
       });
     }

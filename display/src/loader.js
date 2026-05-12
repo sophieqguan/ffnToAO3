@@ -63,7 +63,7 @@ class loader {
    */
   get(r){
     const { before, after } = this.options;
-    while ((r = this._rand()) == this.last);
+    while ((r = this._rand()) === this.last);
 
     return before + messages[this.last = r] + after;
   }
